@@ -31,15 +31,15 @@ class Program
       MethodInfo[] methodsteacher = typeTeacher.GetMethods(BindingFlags.Public| BindingFlags.NonPublic| BindingFlags.Instance);
       foreach(var constructor in constructorPerson) 
       {
-        Console.WriteLine($"constructor - {constructor.Name}, Parameters: {constructor.GetParameters().Length}");
+        Console.WriteLine($"\nconstructor - {constructor.Name}, Parameters: {constructor.GetParameters().Length}");
       }
       foreach(var teacher in methodsteacher)
       {
-        Console.WriteLine($"methods - {teacher.Name}Return Type: {teacher.ReturnType}, Is Public: {teacher.IsPublic}, Is Private: {teacher.IsPrivate}, Is Protected: {teacher.IsFamily}");
+        Console.WriteLine($"\nmethods - {teacher.Name}Return Type: {teacher.ReturnType}, Is Public: {teacher.IsPublic}, Is Private: {teacher.IsPrivate}, Is Protected: {teacher.IsFamily}");
       }
       foreach(var inter in interfaces)
       {
-        Console.WriteLine($"interfaces - {inter}");
+        Console.WriteLine($"\ninterfaces - {inter}");
       }
 
       
