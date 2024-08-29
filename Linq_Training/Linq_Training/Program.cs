@@ -14,7 +14,7 @@ class Program
         }; 
     var older = students.Where(x=>x.Age>18).Select(x=>x);
     GetSortedStudents(older);   
-    var average = students.OrderByDescending(student=>student.Grades.Average()).ToList();
+    var average = students.OrderByDescending(A=>A.Grades.Average()).ToList();
     foreach(var student in average)
     {
         Console.WriteLine("{0} - {1}", student.Name,student.Grades.Average());
