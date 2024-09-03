@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 
+
 public interface IMove
 {
     void Move();
@@ -20,6 +21,7 @@ public class SlowMove:IMove
         Console.WriteLine("slow");
     }
 }
+
 public class Person
 {
     private readonly IMove _move;
@@ -28,3 +30,16 @@ public class Person
          _move = move;
     }
 }
+class Program
+{
+static void Main(string[] args)
+{
+IMove FastMove = new FastMove();
+FastMove.Move();
+IMove SlowMove = new SlowMove();
+SlowMove.Move();
+
+}
+}
+
+
