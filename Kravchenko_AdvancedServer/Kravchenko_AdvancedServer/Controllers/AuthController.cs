@@ -10,7 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Kravchenko_AdvancedServer.Controllers;
 
-[Route("v1/[controller]")]
+[Route("auth")]
 [ApiController]
 public class AuthController : ControllerBase
 {

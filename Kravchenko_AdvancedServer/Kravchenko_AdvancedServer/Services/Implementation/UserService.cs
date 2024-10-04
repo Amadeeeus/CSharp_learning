@@ -43,7 +43,7 @@ public class UserService : IUserService
                 StatusCode = StatusCodes.Status400BadRequest
             };
         }
- 
+        
         var result = _mapper.Map<PublicUserView>(await _userRepository.GetUserInfoAsync(userId));
         _logger.LogInformation("Getting user{0} info...", userId);
         return new CustomSuccessResponse<PublicUserView>()
@@ -77,37 +77,29 @@ public class UserService : IUserService
         };
     }
 
-    public async Task<CustomSuccessResponse<PutUserDtoResponse>> PutUserAsync(PutUserDto dto, Guid userId)
+    public async Task<CustomSuccessResponse<PutUserDtoResponse>> PutUserAsync(PutUserDto putUser, Guid userId)
     {
-        if (dto.Email == null)
+        var user = await _userRepository.PutUserAsync(putUser, userId);
+    
+        if (user == null)
         {
-            _logger.LogWarning("PutUserAsync: Email is null");
-            return new CustomSuccessResponse<PutUserDtoResponse>()
+            return new CustomSuccessResponse<PutUserDtoResponse>
             {
                 Success = false,
-                StatusCode = StatusCodes.Status400BadRequest
+                StatusCode = StatusCodes.Status400BadRequest,
+                Data = null
             };
         }
 
-        if (await _userRepository.GetUserByEmailAsync(dto.Email) is not null)
-        {
-            _logger.LogWarning("PutUserAsync: Email already exist");
-            return new CustomSuccessResponse<PutUserDtoResponse>()
-            {
-                Success = false,
-                StatusCode = StatusCodes.Status400BadRequest
-            };
-        }
-        _logger.LogInformation("PutUserAsync: Updating users");
-        var result = _mapper.Map<PutUserDtoResponse>(await _userRepository.PutUserAsync(dto, userId));
-        return new CustomSuccessResponse<PutUserDtoResponse>()
+        var dtoResponse = _mapper.Map<PutUserDtoResponse>(user);
+        return new CustomSuccessResponse<PutUserDtoResponse>
         {
             Success = true,
             StatusCode = StatusCodes.Status200OK,
-            Data = result
+            Data = dtoResponse
         };
-
     }
+    
 
     public async Task<BaseSuccessResponse> DeleteUserAsync(Guid id)
     {

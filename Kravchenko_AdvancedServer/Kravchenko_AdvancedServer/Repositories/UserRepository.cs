@@ -44,6 +44,7 @@ public class UserRepository : IUserRepository
         user.Name = dto.Name;
         user.Role = dto.Role;
         user.Password = user.Password;
+        user.Avatar = dto.Avatar;
         await _context.SaveChangesAsync();
         return user;
     }

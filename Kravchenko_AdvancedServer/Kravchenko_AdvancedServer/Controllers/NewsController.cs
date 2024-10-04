@@ -12,8 +12,9 @@ using Microsoft.IdentityModel.Tokens;
 namespace Kravchenko_AdvancedServer.Controllers;
 using System.ComponentModel.DataAnnotations;
 
-[Authorize]
-[Route("v1/news")] [ApiController]
+
+[Route("news")] 
+[ApiController]
 public class NewsController:ControllerBase
 {
        
@@ -27,17 +28,11 @@ public class NewsController:ControllerBase
       }
 
       [HttpGet]
-      public async Task<IResult> GetNewsAsync([FromQuery] int page,[FromQuery] int perPage)
+      public async Task<IActionResult> GetNewsAsync([FromQuery] int page,[FromQuery] int perPage)
       {
-            if (!ModelState.IsValid)
-            {
-                  _logger.LogWarning("Invalid request");
-                  return Results.BadRequest(ModelState);
-            }
-
             _logger.LogInformation("get news: page - {page}, Per Page - {perPage}", page, perPage);
             var result = await _NewsService.GetNewsAsync(page, perPage);
-            return Results.Ok(result);
+            return Ok(result);
       }
 
       
@@ -55,20 +50,15 @@ public class NewsController:ControllerBase
       }
 
       
-      [HttpGet("{id}")]
+      [HttpGet("user/{id}")]
       public async Task<IResult> FindNewsById(long id,[FromQuery]int page, [FromQuery] int PerPage)
       {
-            if (!ModelState.IsValid)
-            {
-                  return Results.BadRequest();
-            }
-
             var result = await _NewsService.FindNewsByIdAsync(id, page, PerPage);
             return Results.Ok(result);
       }
 
 
-      [Authorize(Roles = "user")]
+      [Authorize(Roles = "base")]
       [HttpPost]
       public async Task<IResult> PostNewsAsync(NewsDto dto)
       {
@@ -88,7 +78,7 @@ public class NewsController:ControllerBase
       }
 
       
-      [Authorize(Roles = "user")]
+      [Authorize(Roles = "base")]
       [HttpPut("{id}")]
       public async Task<IResult> PutNewsAsync(NewsDto dto,long? id)
       {
@@ -103,7 +93,7 @@ public class NewsController:ControllerBase
       }
       
       
-      [Authorize(Roles = "user")]
+      [Authorize(Roles = "base")]
       [HttpDelete("{id}")]
       public async Task<IResult> DeleteNewsById(long? id)
       {

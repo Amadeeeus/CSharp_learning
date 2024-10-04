@@ -22,6 +22,6 @@ public class JwtProvider : IJwtProvider
             claims:claims,
             signingCredentials:signingCredentials, expires: DateTime.UtcNow.AddMinutes(_options.ExpiresHours));
         var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
-        return tokenValue;
+        return $"Bearer {tokenValue}";
     }
 }

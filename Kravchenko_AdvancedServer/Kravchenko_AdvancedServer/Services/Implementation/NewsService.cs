@@ -105,23 +105,23 @@ public class NewsService : INewsService
         };
     }
 
-    public async Task<CreateNewSuccessResponse>CreateNewsAsync(NewsDto? newsDto, Guid userId)
+    public async Task<CustomSuccessResponse<long>>CreateNewsAsync(NewsDto? newsDto, Guid userId)
     {
         if (newsDto is null || userId == Guid.Empty)
         {
             _logger.LogWarning("CREATENEWS: input parameters are invalid.");
-            return new CreateNewSuccessResponse()
+            return new CustomSuccessResponse<long>()
             {
                 Success = false,
                 StatusCode = StatusCodes.Status400BadRequest
             };
         }
-        await _newsRepository.CreateNewsAsync(newsDto, userId);
-        return new CreateNewSuccessResponse()
+        var result = await _newsRepository.CreateNewsAsync(newsDto, userId);
+        return new CustomSuccessResponse<long>()
         {
             Success = true,
             StatusCode = StatusCodes.Status201Created,
-            Id =  userId
+            Data = result.Value
         };
     }
 

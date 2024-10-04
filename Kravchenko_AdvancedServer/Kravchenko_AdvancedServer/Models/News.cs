@@ -7,5 +7,5 @@ public class News
     public string? Title { get; set; }
     public string? Image { get; set; }
     public ICollection<Tag>? Tags {get; set; } = new List<Tag>();
-    public User? User { get; set;}
+    public User? User{ get; set;}
 }

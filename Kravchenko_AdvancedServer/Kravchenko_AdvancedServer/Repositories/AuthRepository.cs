@@ -32,15 +32,9 @@ public class AuthRepository : IAuthRepository
 
     public async Task<User?> GetUserAsync(string email)
     {
-        try
         {
             _logger.LogInformation("User {1} was found in database", email);
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-        }
-        catch (Exception e)
-        {
-            _logger.LogWarning("User {1} not found in database", email);
-            throw;
         }
     }
 }

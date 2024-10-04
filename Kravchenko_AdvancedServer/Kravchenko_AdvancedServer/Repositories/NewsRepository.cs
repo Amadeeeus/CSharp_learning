@@ -8,8 +8,8 @@ namespace Kravchenko_AdvancedServer.Repositories;
 
 public class NewsRepository : INewsRepository
 {
-    AppDbContext _context;
-    ILogger<NewsRepository> _logger;
+    private readonly AppDbContext _context;
+    private readonly ILogger<NewsRepository> _logger;
 
     public NewsRepository(AppDbContext context, ILogger<NewsRepository> logger)
     {
@@ -20,7 +20,7 @@ public class NewsRepository : INewsRepository
     public async Task<IEnumerable<News?>> GetNewsAsync(int pageNumber, int pageSize)
     {
         _logger.LogInformation("Repository: GetNewsAsync: getting all news");
-        return await _context.News.Where(c => c.Id > pageNumber-1*pageSize).OrderByDescending(c => c.Id).Take(pageSize).ToListAsync();
+        return await _context.News.Skip((pageNumber-1)*pageSize).OrderByDescending(c => c.Id).Take(pageSize).ToListAsync();
     }
 
     public async Task<IEnumerable<News?>> FindNewsAsync(int pageNumber, int pageSize, string? author, string? keyword, string?[] tags)
@@ -44,55 +44,43 @@ public class NewsRepository : INewsRepository
             tag = "Tag existing";
         }
         _logger.LogInformation("Repository: FindNewsAsync: searching news: parameters:{0},{1},{2}",author,keyword,tag);
-        return await news.Where(c=>c.Id>pageNumber-1*pageSize).OrderByDescending(c=>c.Id).Take(pageSize).ToListAsync();
+        return await news.Skip((pageNumber-1)*pageSize).OrderByDescending(c=>c.Id).Take(pageSize).ToListAsync();
     }
 
     public async Task<IEnumerable<News?>> FindNewsByIdAsync(long newsId, int pageNumber, int pageSize)
     {
         _logger.LogInformation("Repository: FindNewsByIdAsync: searching for news by id");
-        return await _context.News.Include(x=>x.Tags).Include(x=>x.User).AsNoTracking().Where(x=>x.Id == newsId && x.Id > pageNumber-1*pageSize)
+        return await _context.News.Include(x=>x.Tags).Include(x=>x.User).Skip((pageNumber-1)*pageSize)
             .OrderByDescending(x=>x.Id).Take(pageSize).ToListAsync();
     }
 
     public async Task<long?> CreateNewsAsync(NewsDto dto, Guid userId)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+        var user = await _context.Users.Where(x => x.Id == userId)
+            .Select(x => new
+            {
+                User = x,
+                News = new News { User = x, Description = dto.Description, Image = dto.Image, Title = dto.Title }
+            }).FirstOrDefaultAsync();
         if (user == null)
         {
             _logger.LogInformation("Repository: CreateNewsAsync: user not found");
             return null;
         }
-        
-        var news = new News
-        {
-            Image = dto.Image,
-            Description = dto.Description,
-            Title = dto.Title,
-            User = user
-        };
-        if (news==null)
-        {
-            _logger.LogInformation("Repository: CreateNewsAsync: news not found");
-            return null;
-        }
         List<Tag> tags = dto.Tags.Select(x => new Tag { Title = x }).ToList();
-        foreach (var tag in tags)
+        foreach (var item in tags)
         {
-            var checkTag = await _context.Tags.FirstOrDefaultAsync(x => x.Title == tag.Title);
-            if (checkTag!=null)
+            var tag = await _context.Tags.FirstOrDefaultAsync(x => x.Title == item.Title);
+            if (tag == null)
             {
-               checkTag.News.Add(news);
+                user!.News.Tags.Add(item);
             }
-            else
-            {
-                news.Tags.Add(tag);
-            }
-            
+            else tag.News.Add(user!.News);
         }
 
-        await _context.News.AddAsync(news);
+        await _context.News.AddAsync(user!.News);
         await _context.SaveChangesAsync();
-        return news.Id;
+        return user.News.Id;
     }
 
     public async Task<bool> PutNewsAsync(long? id, NewsDto dto, Guid userId)

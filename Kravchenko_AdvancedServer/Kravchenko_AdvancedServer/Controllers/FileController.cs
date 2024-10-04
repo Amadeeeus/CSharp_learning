@@ -1,15 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 using Kravchenko_AdvancedServer.Models.Responses;
+using Kravchenko_AdvancedServer.Services;
 using Microsoft.AspNetCore.Mvc;
+using Sprache;
 
 namespace Kravchenko_AdvancedServer.Controllers;
 
 
-[Route("v1/file")]
+[Route("file")]
 [ApiController]
 public class FileController : ControllerBase
 {
-/*    private readonly string currentPath = Path.Combine(Directory.GetCurrentDirectory(), "StaticFile");
     private readonly ILogger<FileController> _logger;
     private readonly IFileService _fileService;
 
@@ -19,33 +20,45 @@ public class FileController : ControllerBase
         _fileService = fileService;
     }
 
+    [HttpPost("uploadFile")]
+    public async Task<ActionResult<CustomSuccessResponse<string>>> UploadFileAsync([Required] IFormFile file)
+    {
+        if (!ModelState.IsValid)
+        {
+            _logger.LogInformation($"Bad Request in:UploadFile");
+            return BadRequest(ModelState);
+        }
+        var result = await _fileService.UploadFileAsync(file);
+        _logger.LogInformation($"File {file.FileName} is start upload");
+        return new CustomSuccessResponse<string>()
+        {
+            StatusCode = StatusCodes.Status200OK,
+            Success = true,
+            Data = result
+        };
+    }
 
     [HttpGet("{filename}")]
-    public async Task<IResult> GetFileAsync(string filename)
+    public async Task<IActionResult> GetFileAsync(string filename)
     {
-        var filepath = Path.Combine(currentPath, filename);
-        var result = await _fileService.GetFile(filepath);
-        if (result == null)
+        if (!ModelState.IsValid)
         {
-            _logger.LogWarning("Error! Missing file in {0}", filepath);
-            return Results.BadRequest(new BaseSuccessResponse
-                {
-                    Success = false,
-                    StatusCode = StatusCodes.Status400BadRequest
-                });
+            _logger.LogInformation($"BadRequest in:GetFile");
+            return BadRequest();
+        }
+        _logger.LogInformation($"Finding: {filename}");
+        var result = await _fileService.GetFile(filename);
+        if (string.IsNullOrEmpty(result))
+        {
+            _logger.LogWarning($"File {filename} not found");
+            return NotFound();
         }
 
-        _logger.LogInformation("File{1} found in {0}", filepath, filename);
-        return Results.File(result.FileContents, result.ContentType, result.FileDownloadName);
+        var mimeType = _fileService.GetMimeType(filename);
+        _logger.LogInformation($"File {filename} found: {mimeType}");
+        return PhysicalFile(result, mimeType);
     }
 
-    [HttpPost("uploadFile")]
-    public async Task<IResult> UploadFileAcync([Required] IFormFile file)
-    {
-        var result = await _fileService.UploadFileAsync(file,currentPath);
-        _logger.LogInformation("File {1} uploaded to {0}", currentPath, file.FileName);
-        return Results.Ok(result);
-    }
+    
 
-*/
 }

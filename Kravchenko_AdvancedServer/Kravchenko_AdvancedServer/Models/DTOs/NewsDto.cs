@@ -4,7 +4,7 @@ public class NewsDto
 {
     [StringLength(160, MinimumLength = 3)]
     public string? Description { get; set; }
-    [StringLength(130, MinimumLength = 3)] 
+    //[StringLength(130, MinimumLength = 3)] 
     public string? Image { get; set; }
     public string[] Tags { get; set; } = [];
     [StringLength(160, MinimumLength = 3)]

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Kravchenko_AdvancedServer.Controllers;
 [Authorize]
-[Route("v1/user")]
+[Route("user")]
 public class UserController:ControllerBase
 {
     private readonly ILogger<UserController> _logger;

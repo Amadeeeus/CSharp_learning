@@ -14,7 +14,7 @@ public interface INewsService
     Task<CustomSuccessResponse<PageableResponse<List<GetNewsOutDto>>>> FindNewsByIdAsync(long newsId,
         int pageNumber, int pageSize);
 
-    Task<CreateNewSuccessResponse>CreateNewsAsync(NewsDto? newsDto, Guid userId);
+    Task<CustomSuccessResponse<long>>CreateNewsAsync(NewsDto? newsDto, Guid userId);
     Task<BaseSuccessResponse> UpdateNewsAsync(long? id, NewsDto? newsDto, Guid userId);
     Task<BaseSuccessResponse> DeleteNewsAsync(long? id);
 }
